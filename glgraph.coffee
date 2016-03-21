@@ -1,1 +1,1 @@
-exports.glenv = require './src/glenv.coffee'
+exports.env = require './src/env.coffee'
