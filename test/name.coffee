@@ -65,3 +65,24 @@ describe 'glgraph.name.Name', () ->
       legalNames = ['f', 'f1', 'f_', 'foo', 'foo_bar']
       for name in legalNames
         Name::isLegalBaseName(name).should.equal true, "#{JSON.stringify name} is legal"
+
+  describe 'canonicalize', () ->
+    it 'should fit official test cases', () ->
+      tests = [
+        ['', '']
+        ['/', '/']
+        ['foo', 'foo']
+        ['/foo', '/foo']
+        ['/foo/', '/foo']
+        ['/foo/bar', '/foo/bar']
+        ['/foo/bar/', '/foo/bar']
+        ['/foo/bar//', '/foo/bar']
+        ['/foo//bar', '/foo/bar']
+        ['//foo/bar', '/foo/bar']
+        ['foo/bar', 'foo/bar']
+        ['foo//bar', 'foo/bar']
+        ['foo/bar/', 'foo/bar']
+        ['/foo/bar', '/foo/bar']
+      ]
+      for [input, expected] in tests
+        Name::canonicalize(input).should.equal expected, "'#{input}' => '#{expected}'"

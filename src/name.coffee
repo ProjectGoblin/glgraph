@@ -53,6 +53,18 @@ class Name
   join: (ns, name) ->
     if isPrivate name or isGlobal name
       return name
+  # Put name in canonical form. Extra slashes '//' are removed and
+  # name is returned without any trailing slash, e.g. /foo/bar
+  #
+  # @param name [String] ROS name
+  canonicalize: (name) ->
+    if not name or name == Name
+      return name
+    canonical = (x for x in name.split SEP when x).join SEP
+    if name.startsWith SEP
+      return SEP + canonical
+    else
+      return canonical
 
 # get ROS Namespace
 #
