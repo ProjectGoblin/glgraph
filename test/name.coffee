@@ -66,6 +66,36 @@ describe 'glgraph.name.Name', () ->
       for name in legalNames
         Name::isLegalBaseName(name).should.equal true, "#{JSON.stringify name} is legal"
 
+  describe 'join', () ->
+    test = (ns, name, expected) ->
+      Name::join(ns, name).should.equal expected,
+        "(#{JSON.stringify ns}, #{JSON.stringify name}) => #{JSON.stringify expected}"
+
+    it 'private and global names cannot be joined', () ->
+      cases = [
+        ['/foo', '~name', '~name']
+        ['/foo', '/name', '/name']
+        ['~', '~name', '~name']
+        ['/', '/name', '/name']
+      ]
+      for [ns, name, expected] in cases
+        test ns, name, expected
+
+    it "ns can be '~' or '/'", () ->
+      cases = [
+        ['~', 'name', '~name']
+        ['/', 'name', '/name']
+        ['/ns', 'name', '/ns/name']
+        ['/ns/', 'name', '/ns/name']
+        ['/ns', 'ns2/name', '/ns/ns2/name']
+        ['/ns/', 'ns2/name', '/ns/ns2/name']
+      ]
+      for [ns, name, expected] in cases
+        test ns, name, expected
+
+    it "allow ns to be empty", () ->
+      test '', 'name', 'name'
+
   describe 'canonicalize', () ->
     it 'should fit official test cases', () ->
       tests = [

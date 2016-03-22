@@ -14,13 +14,13 @@ class Name
   #
   # @param name [String] must be a legal name in canonical form
   # @return [Boolean] True if name is a privately referenced name (i.e. /ns/name)
-  isPrivate: (name) -> Boolean name and name[0] == PRIV_NAME
+  isPrivate: (name) -> name? and name.startsWith PRIV_NAME
 
   # Test if name is a global graph resource name.
   #
   # @param name [String] must be a legal name in canonical form
   # @return [Boolean] True if name is a privately referenced name (i.e. ~name)
-  isGlobal: (name) -> Boolean name and name[0] == SEP
+  isGlobal: (name) -> name? and name.startsWith SEP
 
   # Check if name is a legal ROS name for graph resources
   # (alphabetical character followed by alphanumeric, underscore, or
@@ -44,15 +44,21 @@ class Name
     REGEXP = /^[A-Za-z][\w]*$/
     return name? and (name.match(REGEXP)?[0]) == name
 
-
   # Join a namespace and name. If name is unjoinable (i.e. ~private or /global) it will be returned without joining
   #
   # @param ns [String] namespace ('/' and '~' are both legal). If ns is the empty string, name will be returned.
   # @param name [String] a legal name
   # @return [String] name concatenated to ns, or name if it is unjoinable.
   join: (ns, name) ->
-    if isPrivate name or isGlobal name
+    if (Name::isPrivate name) or (Name::isGlobal name) or not ns
       return name
+    if ns == PRIV_NAME
+      return PRIV_NAME + name
+    if ns.endsWith SEP
+      return ns + name
+    else
+      return ns + SEP + name
+
   # Put name in canonical form. Extra slashes '//' are removed and
   # name is returned without any trailing slash, e.g. /foo/bar
   #
