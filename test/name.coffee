@@ -14,6 +14,15 @@ describe 'glgraph.name.Name', () ->
     it 'should treats undefined as illegal', () ->
       Name::isPrivate().should.equal false
 
+    it 'should fit official cases', () ->
+      tests = ['~name', '~name/sub']
+      fails = ['', 'not_private', 'not/private', 'not/~private',
+        '/not/~private']
+      for test in tests
+        Name::isPrivate(test).should.equal yes, "('#{test}') => yes"
+      for test in fails
+        Name::isPrivate(test).should.equal no, "('#{test}') => no"
+
   describe 'isGlobal', () ->
     it "should treats '/ns' as global", () ->
       Name::isGlobal('/ns').should.equal true
@@ -26,6 +35,15 @@ describe 'glgraph.name.Name', () ->
 
     it 'should treats undefined as illegal', () ->
       Name::isGlobal().should.equal false
+
+    it 'should fit official cases', () ->
+      tests = ['/', '/global', '/global2']
+      fails = ['', 'not_global', 'not/global']
+      for test in tests
+        Name::isGlobal(test).should.equal yes
+      for test in fails
+        Name::isGlobal(test).should.equal no
+
 
   describe 'isLegal', () ->
     it "should treats empty string as legal name", () ->
@@ -46,25 +64,38 @@ describe 'glgraph.name.Name', () ->
     it 'should treats undefined as illegal', () ->
       Name::isLegal().should.equal false
 
+    it 'should fit official cases', () ->
+      tests = ['',
+        'f', 'f1', 'f_', 'f/', 'foo', 'foo_bar', 'foo/bar', 'foo/bar/baz',
+        '~f', '~a/b/c',
+        '~/f',
+        '/a/b/c/d', '/']
+      for test in tests
+        Name::isLegal(test).should.equal yes
+      failures = [null, undefined,
+        'foo++', 'foo-bar', '#foo',
+        'hello\n', '\t', ' name', 'name ',
+        'f//b',
+        '1name', 'foo\\']
+      for test in failures
+        Name::isLegal(test).should.equal no
+
   describe 'isLegalBase', () ->
-    it "should return false on illeagl names", () ->
-      illegalNames = [null,
-        undefined,
-        '',
-        "hello\n", "\t", 'foo++', 'foo-bar',
-        '#foo',
+    it "should return false on illegal names", () ->
+      illegalNames = [null, undefined, '',
+        "hello\n", "\t", 'foo++', 'foo-bar', '#foo',
         'f/', 'foo/bar', '/', '/a',
         'f//b',
         '~f', '~a/b/c',
         ' name', 'name ',
         '1name', 'foo\\']
       for name in illegalNames
-        Name::isLegalBaseName(name).should.equal false, "#{JSON.stringify name} is illegal"
+        Name::isLegalBaseName(name).should.equal no, "#{JSON.stringify name} is illegal"
 
-    it "should return false on illeagl names", () ->
+    it "should return false on illegal names", () ->
       legalNames = ['f', 'f1', 'f_', 'foo', 'foo_bar']
       for name in legalNames
-        Name::isLegalBaseName(name).should.equal true, "#{JSON.stringify name} is legal"
+        Name::isLegalBaseName(name).should.equal yes, "#{JSON.stringify name} is legal"
 
   describe 'join', () ->
     test = (ns, name, expected) ->
@@ -116,3 +147,71 @@ describe 'glgraph.name.Name', () ->
       ]
       for [input, expected] in tests
         Name::canonicalize(input).should.equal expected, "'#{input}' => '#{expected}'"
+
+  describe 'getNamespace', () ->
+    test = (input, expected) ->
+      Name::getNamespace(input).should.equal expected, "(#{JSON.stringify input}) => #{JSON.stringify expected}"
+
+    it 'should works on official test cases', () ->
+      cases = [
+        ['', '/']
+        ['/', '/']
+        ['/foo', '/']
+        ['/foo/', '/']
+        ['/foo/bar', '/foo/']
+        ['/foo/bar/', '/foo/']
+        ['/foo/bar/baz', '/foo/bar/']
+        ['/foo/bar/baz/', '/foo/bar/']
+      ]
+      for [input, expected] in cases
+        test input, expected
+
+    it 'should works on unicode', () ->
+      cases = [
+        ['', '/']
+        ['/', '/']
+        ['/foo/bar/baz/', '/foo/bar/']
+      ]
+      for [input, expected] in cases
+        test input, expected
+
+  describe 'resolve', () ->
+    it 'should fit official cases', () ->
+      test = (name, ns, expected) ->
+        Name::resolve(name, ns).should.equal expected, "('#{name}', '#{ns}') => '#{expected}'"
+      cases = [
+        ['', '/', '/']
+        ['', '/node', '/']
+        ['', '/ns1/node', '/ns1/']
+        ['foo', '', '/foo']
+        ['foo/', '', '/foo']
+        ['/foo', '', '/foo']
+        ['/foo/', '', '/foo']
+        ['/foo', '/', '/foo']
+        ['/foo/', '/', '/foo']
+        ['/foo', '/bar', '/foo']
+        ['/foo/', '/bar', '/foo']
+        ['foo', '/ns1/ns2', '/ns1/foo']
+        ['foo', '/ns1/ns2/', '/ns1/foo']
+        ['foo', '/ns1/ns2/ns3/', '/ns1/ns2/foo']
+        ['foo/', '/ns1/ns2', '/ns1/foo']
+        ['/foo', '/ns1/ns2', '/foo']
+        ['foo/bar', '/ns1/ns2', '/ns1/foo/bar']
+        ['foo//bar', '/ns1/ns2', '/ns1/foo/bar']
+        ['foo/bar', '/ns1/ns2/ns3', '/ns1/ns2/foo/bar']
+        ['foo//bar//', '/ns1/ns2/ns3', '/ns1/ns2/foo/bar']
+        ['~foo', '/', '/foo']
+        ['~foo', '/node', '/node/foo']
+        ['~foo', '/ns1/ns2', '/ns1/ns2/foo']
+        ['~foo/', '/ns1/ns2', '/ns1/ns2/foo']
+        ['~foo/bar', '/ns1/ns2', '/ns1/ns2/foo/bar']
+        ['~/foo', '/', '/foo']
+        ['~/foo', '/node', '/node/foo']
+        ['~/foo', '/ns1/ns2', '/ns1/ns2/foo']
+        ['~/foo/', '/ns1/ns2', '/ns1/ns2/foo']
+        ['~/foo/bar', '/ns1/ns2', '/ns1/ns2/foo/bar']
+      ]
+      for [name, ns, expected] in cases
+        test name, ns, expected
+    
+

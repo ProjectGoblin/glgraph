@@ -72,6 +72,43 @@ class Name
     else
       return canonical
 
+  # Get the namespace of name. The namespace is returned with a
+  # trailing slash in order to favor easy concatenation and easier use
+  # within the global context.
+  getNamespace: (name) ->
+    if not _.isString name
+      throw TypeError "Cannot get namespace from #{name}[#{typeof name}]"
+    if not name or name == SEP
+      return SEP
+    crumbs = (crumb for crumb in name.split(SEP) when crumb)
+    crumbs.pop()
+    if crumbs.length
+      return SEP + crumbs.join(SEP) + SEP
+    else
+      return SEP
+
+  # Resolve a ROS name to its global, canonical form. Private ~names
+  # are resolved relative to the node name.
+  # @param name [String] name to solve
+  # @param ns [String] node name to resolve relative to
+  # @param remappings [Object] Map of resolved remappings. Use {} or null to indicate no remapping
+  # @return [String] Resolved name. If name is empty/not given, resolve_name
+  # returns parent namespace_. If namespace_ is empty/not given
+  resolve: (name, ns, remapping) ->
+    if not name
+      return Name::getNamespace ns
+    name = Name::canonicalize name
+    if Name::isGlobal name
+      resolved_name = name
+    else if Name::isPrivate name
+      resolved_name = Name::canonicalize(ns + SEP + name[1..])
+    else # relative
+      resolved_name = Name::getNamespace(ns) + name
+    if remapping and remapping[resolved_name] isnt undefined
+      return remapping[resolved_name]
+    else
+      return resolved_name
+
 # get ROS Namespace
 #
 # @param  env  [Object] environment dictionary (defaults to os.environ)
