@@ -1,5 +1,4 @@
 _ = require 'underscore'
-sys = require 'sys'
 process = require 'process'
 
 env = require './env.coffee'
@@ -38,6 +37,12 @@ class Name
       return true
     m = name.match REGEXP
     return m? and m[0] == name and (name.search /\/\//) == -1
+
+  # Validates that name is a legal base name for a graph resource. A base name has
+  # no namespace context, e.g. "node_name".
+  isLegalBaseName: (name) ->
+    REGEXP = /^[A-Za-z][\w]*$/
+    return name? and (name.match(REGEXP)?[0]) == name
 
 
   # Join a namespace and name. If name is unjoinable (i.e. ~private or /global) it will be returned without joining

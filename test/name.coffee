@@ -45,3 +45,23 @@ describe 'glgraph.name.Name', () ->
 
     it 'should treats undefined as illegal', () ->
       Name::isLegal().should.equal false
+
+  describe 'isLegalBase', () ->
+    it "should return false on illeagl names", () ->
+      illegalNames = [null,
+        undefined,
+        '',
+        "hello\n", "\t", 'foo++', 'foo-bar',
+        '#foo',
+        'f/', 'foo/bar', '/', '/a',
+        'f//b',
+        '~f', '~a/b/c',
+        ' name', 'name ',
+        '1name', 'foo\\']
+      for name in illegalNames
+        Name::isLegalBaseName(name).should.equal false, "#{JSON.stringify name} is illegal"
+
+    it "should return false on illeagl names", () ->
+      legalNames = ['f', 'f1', 'f_', 'foo', 'foo_bar']
+      for name in legalNames
+        Name::isLegalBaseName(name).should.equal true, "#{JSON.stringify name} is legal"
