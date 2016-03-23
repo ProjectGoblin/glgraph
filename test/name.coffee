@@ -1,6 +1,7 @@
 _ = require 'underscore'
 should = (require 'chai').should()
 Name = require '../src/name.coffee'
+env = require '../src/env.coffee'
 
 describe 'glgraph.name.Name', () ->
   describe 'isPrivate', () ->
@@ -61,6 +62,20 @@ describe 'glgraph.name.Name', () ->
       name = 'foo'
       Name::toGlobal(name)
       name.should.equal 'foo'
+
+  describe 'toCallerID', () ->
+    it 'should works by default', () ->
+      Name::toCallerID('node').should.equal '/node/'
+      Name::toCallerID('bar/node').should.equal '/bar/node/'
+      Name::toCallerID('/bar/node').should.equal '/bar/node/'
+
+    it 'should works when ENV set', () ->
+      ns = process.env[env.ROS_NAMESPACE]
+      process.env[env.ROS_NAMESPACE] = '/test/'
+      Name::toCallerID('node').should.equal '/test/node/'
+      Name::toCallerID('bar/node').should.equal '/test/bar/node/'
+      Name::toCallerID('/bar/node').should.equal '/bar/node/'
+      process.env[env.ROS_NAMESPACE] = ns
 
   describe 'isLegal', () ->
     it "should treats empty string as legal name", () ->
@@ -248,4 +263,26 @@ describe 'glgraph.name', () ->
       Name::loadMapping(['c:=3', 'c:=', ':=3', 'a:=1',
         'b:=2']).should.eql {a: '1', b: '2', c: '3'}
 
+  describe 'getROSNamespace', () ->
+    ns = process.env[env.ROS_NAMESPACE]
+    it 'should works...', () ->
+      Name::getROSNamespace().should.equal '/'
+      Name::getROSNamespace(null, []).should.equal '/'
+      Name::getROSNamespace({}, null).should.equal '/'
+      Name::getROSNamespace({}, []).should.equal '/'
 
+    it "should works when #{env.ROS_NAMESPACE} is set", () ->
+      process.env[env.ROS_NAMESPACE] = 'unresolved'
+      Name::getROSNamespace().should.equal '/unresolved/'
+      Name::getROSNamespace({'ROS_NAMESPACE': '/resolved'}).should.equal '/resolved/'
+      process.env[env.ROS_NAMESPACE] = ns
+
+    it 'should works when argv is set', () ->
+      r = process.argv
+      process.argv = ['foo', '__ns:=unresolved_ns']
+      Name::getROSNamespace().should.equal '/unresolved_ns/'
+      Name::getROSNamespace(null, ['foo', '__ns:=unresolved_ns2']).should.equal '/unresolved_ns2/'
+      process.argv = ['foo', '__ns:=/resolved_ns/']
+      Name::getROSNamespace().should.equal '/resolved_ns/'
+      Name::getROSNamespace(null, ['foo', '__ns:=resolved_ns2']).should.equal '/resolved_ns2/'
+      process.argv = r

@@ -85,6 +85,13 @@ class Name
       name = name + SEP
     return name
 
+  # Resolve a local name to the caller ID based on ROS environment settings (i.e. ROS_NAMESPACE)
+  #
+  # @param name [String] local name to calculate caller ID from, e.g. 'camera', 'node'
+  # @return [String] caller ID based on supplied local name
+  toCallerID: (name) ->
+    Name::toGlobal(Name::join(Name::getROSNamespace(), name))
+
   # Get the namespace of name. The namespace is returned with a
   # trailing slash in order to favor easy concatenation and easier use
   # within the global context.
@@ -137,26 +144,17 @@ class Name
         mapping[src] = dest
     return mapping
 
-# get ROS Namespace
-#
-# @param  env  [Object] environment dictionary (defaults to os.environ)
-# @param  argv [Array]  command-line arguments (defaults to sys.argv)
-# @return [String] ROS  namespace of current program
-getROSNamespace = (env=null, argv=null) ->
-  NS_PREFIX = '__ns:='
-  argv ?= process.argv
-  env ?= process.env
-  for arg in argv
-    if arg.startsWith NS_PREFIX
-      return makeGlobalNS arg[len(NS_PREFIX)..]
-  return makeGlobalNS (env[glenv.ROS_NAMESPACE] || GLOBALNS)
-
-# Resolve a local name to the caller ID based on ROS environment settings (i.e. ROS_NAMESPACE)
-#
-# @param name [String] local name to calculate caller ID from, e.g. 'camera', 'node'
-# @return [String] caller ID based on supplied local name
-makeCallerID = (name) -> name
-
+  # get ROS Namespace
+  #
+  # @param  environ [Object] environment dictionary (defaults to os.environ)
+  # @param  argv    [Array]  command-line arguments (defaults to sys.argv)
+  # @return [String] ROS  namespace of current program
+  getROSNamespace: (environ=process.env, argv=process.argv) ->
+    NS_PREFIX = '__ns:='
+    for arg in argv
+      if arg.startsWith NS_PREFIX
+        return Name::toGlobal(arg[NS_PREFIX.length..])
+    return Name::toGlobal(environ[env.ROS_NAMESPACE] || GLOBALNS)
 
 module.exports = Name
 
