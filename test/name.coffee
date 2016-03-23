@@ -43,6 +43,24 @@ describe 'glgraph.name.Name', () ->
       for test in fails
         Name::isGlobal(test).should.equal no
 
+  describe 'toGlobal', () ->
+    it 'should throw Error on private name', () ->
+      should.Throw((-> Name::toGlobal('~foo')), Error, "Cannot turn private name [~foo] into a global name")
+
+    it 'should works on relative names', () ->
+      Name::toGlobal('').should.equal '/'
+      Name::toGlobal('foo').should.equal '/foo/'
+
+    it 'should works on public names', () ->
+      Name::toGlobal('/foo').should.equal '/foo/'
+      Name::toGlobal('/foo/').should.equal '/foo/'
+      Name::toGlobal('/foo/bar').should.equal '/foo/bar/'
+      Name::toGlobal('/foo/bar/').should.equal '/foo/bar/'
+
+    it 'should be functional', () ->
+      name = 'foo'
+      Name::toGlobal(name)
+      name.should.equal 'foo'
 
   describe 'isLegal', () ->
     it "should treats empty string as legal name", () ->

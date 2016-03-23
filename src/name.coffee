@@ -71,6 +71,20 @@ class Name
     else
       return canonical
 
+  # Convert name to a global name with a trailing namespace separator.
+  #
+  # @param name [String] name to convert
+  # @return [String] converted name
+  # @throw throws Error on private name
+  toGlobal: (name) ->
+    if Name::isPrivate(name)
+      throw Error "Cannot turn private name [#{name}] into a global name"
+    if not Name::isGlobal(name) # relative names
+      name = SEP + name
+    if not name.endsWith(SEP) # global names that not ends with SEP
+      name = name + SEP
+    return name
+
   # Get the namespace of name. The namespace is returned with a
   # trailing slash in order to favor easy concatenation and easier use
   # within the global context.
