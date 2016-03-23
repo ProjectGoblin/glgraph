@@ -1,4 +1,6 @@
 _ = require 'underscore'
+os = require 'os'
+crypto = require 'crypto'
 process = require 'process'
 
 env = require './env.coffee'
@@ -145,6 +147,12 @@ class Name
       return Name::join(Name::toCallerID(scriptName), name[1..])
     else
       return Name::getROSNamespace() + name
+
+  # Generate a ROS-legal 'anonymous' name
+  genAnonymous: (id='anonymous') ->
+    host = os.hostname().replace(/[\.-:]/, '_')
+    rand = crypto.randomBytes(16).toString('hex')
+    "#{id}_#{host}_#{process.pid}_#{rand}"
 
   # Load name mappings encoded in command-line arguments. This will filter
   # out any parameter assignment mappings.

@@ -256,6 +256,24 @@ describe 'glgraph.name.Name', () ->
       Name::resolveScriptName('/myscript', 'foo').should.equal(Name::join(Name::getROSNamespace(), 'foo'))
       Name::resolveScriptName('/myscript', '~private').should.equal('/myscript/private')
 
+  describe 'genAnonymous', () ->
+    val = Name::genAnonymous('foo')
+    it 'should contains id', () ->
+      val.search('foo').should.not.equal -1
+
+    it "should not contains '/'", () ->
+      val.search('/').should.equal -1
+
+    it "should contains other characters", () ->
+      val.should.not.equal 'foo'
+      
+    it "should not generate same name in 10K tries", () ->
+      names = new Set()
+      for counter in [1..10000]
+        name = Name::genAnonymous()
+        names.has(name).should.equal no
+        names.add(name)
+
 describe 'glgraph.name', () ->
   describe 'loadMapping', () ->
     it 'should loads nothing if no remapping found', () ->
