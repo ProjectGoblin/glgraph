@@ -1,3 +1,4 @@
+require('blanket')(pattern: 'lib')
 should = (require 'chai').should()
 graph = require '../lib/graph'
 env = graph.env

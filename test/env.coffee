@@ -1,3 +1,4 @@
+require('blanket')(pattern: 'lib')
 _ = require 'underscore'
 should = (require 'chai').should()
 graph = require '../lib/graph'
