@@ -129,6 +129,23 @@ class Name
     else
       return resolved_name
 
+  # Name resolver for scripts. Supports :envvar:`ROS_NAMESPACE`.  Does not
+  # support remapping arguments.
+  #
+  # @param scriptName [String] name of script. script_name must not
+  # @param name [String] name to resolve
+  # contain a namespace
+  # @return [String] resolved name
+  resolveScriptName: (scriptName, name) ->
+    if not name
+      return Name::getROSNamespace()
+    if Name::isGlobal(name)
+      return name
+    if Name::isPrivate(name)
+      return Name::join(Name::toCallerID(scriptName), name[1..])
+    else
+      return Name::getROSNamespace() + name
+
   # Load name mappings encoded in command-line arguments. This will filter
   # out any parameter assignment mappings.
   #

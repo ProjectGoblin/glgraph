@@ -248,7 +248,14 @@ describe 'glgraph.name.Name', () ->
       ]
       for [name, ns, expected] in cases
         test name, ns, expected
-        
+
+  describe 'resolveScriptName', () ->
+    it 'should fit official cases', () ->
+      Name::resolveScriptName('/myscript', '/global').should.equal '/global'
+      Name::resolveScriptName('/myscript', '').should.equal(Name::getROSNamespace())
+      Name::resolveScriptName('/myscript', 'foo').should.equal(Name::join(Name::getROSNamespace(), 'foo'))
+      Name::resolveScriptName('/myscript', '~private').should.equal('/myscript/private')
+
 describe 'glgraph.name', () ->
   describe 'loadMapping', () ->
     it 'should loads nothing if no remapping found', () ->
