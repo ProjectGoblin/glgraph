@@ -1,5 +1,5 @@
 {
-  "name": "rosgraph.js",
+  "name": "ros-graph",
   "version": "0.1.0",
   "description": "ROS Graph library in Node.js",
   "main": "lib/graph.js",
@@ -23,7 +23,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ProjectGoblin/glgraph.git"
+    "url": "git+https://github.com/ProjectGoblin/ros-graph.git"
   },
   "keywords": [
     "ROS",
