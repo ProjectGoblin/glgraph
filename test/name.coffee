@@ -1,7 +1,6 @@
 _ = require 'underscore'
 should = (require 'chai').should()
-name = require '../src/name.coffee'
-Name = name.Name;
+Name = require '../src/name.coffee'
 
 describe 'glgraph.name.Name', () ->
   describe 'isPrivate', () ->
@@ -213,5 +212,22 @@ describe 'glgraph.name.Name', () ->
       ]
       for [name, ns, expected] in cases
         test name, ns, expected
-    
+        
+describe 'glgraph.name', () ->
+  describe 'loadMapping', () ->
+    it 'should loads nothing if no remapping found', () ->
+      test = (c) -> Name::loadMapping([c]).should.eql {}, "('#{[c]}') => {}"
+      test c for c in ['foo', ':=', ':=:=', 'f:=', ':=b', 'foo:=bar:=baz']
+
+    it 'should ignore node param assignments', () ->
+      Name::loadMapping(['_foo:=bar']).should.eql {}
+      Name::loadMapping(['foo:=bar']).should.eql {'foo': 'bar'}
+
+    it 'should allow double-underscore names', () ->
+      Name::loadMapping(['__foo:=bar']).should.eql {'__foo': 'bar'}
+      Name::loadMapping(['./f', '-x', '--blah',
+        'foo:=bar']).should.eql {'foo': 'bar'}
+      Name::loadMapping(['c:=3', 'c:=', ':=3', 'a:=1',
+        'b:=2']).should.eql {a: '1', b: '2', c: '3'}
+
 

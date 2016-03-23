@@ -4,7 +4,6 @@ process = require 'process'
 env = require './env.coffee'
 
 GLOBALNS = '/'
-REMAP = ":="
 ANYTYPE = '*'
 
 class Name
@@ -109,6 +108,21 @@ class Name
     else
       return resolved_name
 
+  # Load name mappings encoded in command-line arguments. This will filter
+  # out any parameter assignment mappings.
+  #
+  # @param [[String]] argv
+  # @return [{String: String}]
+  loadMapping: (argv) ->
+    REMAP = /:=/
+    mapping = {}
+    for arg in argv when arg.search(REMAP) != -1
+      crumbs = (s.trim() for s in arg.split(REMAP))
+      [src, dest] = crumbs
+      if src and dest and crumbs.length is 2 and src.match(/^_[^_].*/) is null
+        mapping[src] = dest
+    return mapping
+
 # get ROS Namespace
 #
 # @param  env  [Object] environment dictionary (defaults to os.environ)
@@ -127,8 +141,8 @@ getROSNamespace = (env=null, argv=null) ->
 #
 # @param name [String] local name to calculate caller ID from, e.g. 'camera', 'node'
 # @return [String] caller ID based on supplied local name
-makeCallerID = (name) ->
+makeCallerID = (name) -> name
 
 
-exports.Name = Name
+module.exports = Name
 
