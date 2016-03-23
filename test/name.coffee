@@ -1,6 +1,7 @@
 should = (require 'chai').should()
-Name = require '../src/name'
-env = require '../src/env'
+graph = require '../lib/graph'
+env = graph.env
+Name = graph.name
 
 describe 'glgraph.name.Name', () ->
   describe 'isPrivate', () ->

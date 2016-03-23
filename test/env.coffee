@@ -1,7 +1,7 @@
 _ = require 'underscore'
 should = (require 'chai').should()
-process = require 'process'
-env = require '../src/env.coffee'
+graph = require '../lib/graph'
+env = graph.env
 
 globalENV = {}
 globalARGV = []

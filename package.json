@@ -1,22 +1,25 @@
 {
-  "name": "glgraph",
+  "name": "rosgraph.js",
   "version": "0.1.0",
   "description": "ROS Graph library in Node.js",
-  "main": "glgraph.coffee",
+  "main": "lib/graph.js",
   "dependencies": {
-    "coffee-script": "^1.10.0",
     "underscore": "^1.8.3"
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "coffee-script": "^1.10.0",
     "grunt": "^0.4.5",
+    "grunt-codo": "^0.2.0",
+    "grunt-contrib-coffee": "^1.0.0",
     "grunt-mocha-cli": "^2.0.0",
     "grunt-shell": "^1.2.1",
     "load-grunt-tasks": "^3.4.1",
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt test",
+    "prepublish": "grunt build"
   },
   "repository": {
     "type": "git",
@@ -24,7 +27,7 @@
   },
   "keywords": [
     "ROS",
-    "CoffeeScript"
+    "rosgraph"
   ],
   "author": "Yufei Liu",
   "license": "MIT",

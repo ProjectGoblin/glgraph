@@ -226,11 +226,10 @@ crashlytics-build.properties
 fabric.properties
 
 # Ignore generated .js & .js.map
-*.js
-*.map
+lib/
 
 # Ignore .idea
-.idea
+.idea/
 
 # Ignore generated doc
-doc
+doc/

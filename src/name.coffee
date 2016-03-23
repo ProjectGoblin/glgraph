@@ -3,7 +3,7 @@ os = require 'os'
 crypto = require 'crypto'
 process = require 'process'
 
-env = require './env.coffee'
+env = require './env'
 
 GLOBAL_NAMESPACE = '/'
 PRIVATE_PREFIX = '~'

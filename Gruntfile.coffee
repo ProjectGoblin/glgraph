@@ -13,10 +13,22 @@ module.exports = (grunt) ->
         bail: true
       all: ['test/*.coffee']
     shell: run: command: runCoffee 'master'
+    coffee:
+      compile:
+        options:
+          sourceMap: true
+        files:
+          'lib/env.js': 'src/env.coffee'
+          'lib/name.js': 'src/name.coffee'
+          'lib/graph.js': 'src/graph.coffee'
+    codo:
+      src: ['src']
 
+  grunt.registerTask 'test',    ['build', 'mochacli']
+  grunt.registerTask 'build',   'coffee:compile'
   grunt.registerTask 'version', () ->
     grunt.log.writeln "glgraph #{grunt.config.get 'pkg.version'}"
-
-  grunt.registerTask 'run',     'shell:run'
-  grunt.registerTask 'test',    'mochacli'
+  grunt.registerTask 'clean', () ->
+    grunt.file.delete file for file in ['lib', 'doc']
+    
   grunt.registerTask 'default', 'version'
