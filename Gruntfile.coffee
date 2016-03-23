@@ -1,6 +1,3 @@
-runCoffee = (filename) ->
-  "node -r coffee-script/register #{filename}.coffee"
-
 module.exports = (grunt) ->
   (require 'load-grunt-tasks') grunt
 
@@ -12,7 +9,6 @@ module.exports = (grunt) ->
         reporter: 'nyan'
         bail: true
       all: ['test/*.coffee']
-    shell: run: command: runCoffee 'master'
     coffee:
       compile:
         options:
