@@ -1,103 +1,102 @@
-_ = require 'underscore'
 should = (require 'chai').should()
-Name = require '../src/name.coffee'
-env = require '../src/env.coffee'
+Name = require '../src/name'
+env = require '../src/env'
 
 describe 'glgraph.name.Name', () ->
   describe 'isPrivate', () ->
     it "should treats '~private' as private", () ->
-      Name::isPrivate('~private').should.equal true
+      Name.isPrivate('~private').should.equal true
 
     it "should treats 'private' as normal", () ->
-      Name::isPrivate('private').should.equal false
+      Name.isPrivate('private').should.equal false
 
     it 'should treats undefined as illegal', () ->
-      Name::isPrivate().should.equal false
+      Name.isPrivate().should.equal false
 
     it 'should fit official cases', () ->
       tests = ['~name', '~name/sub']
       fails = ['', 'not_private', 'not/private', 'not/~private',
         '/not/~private']
       for test in tests
-        Name::isPrivate(test).should.equal yes, "('#{test}') => yes"
+        Name.isPrivate(test).should.equal yes, "('#{test}') => yes"
       for test in fails
-        Name::isPrivate(test).should.equal no, "('#{test}') => no"
+        Name.isPrivate(test).should.equal no, "('#{test}') => no"
 
   describe 'isGlobal', () ->
     it "should treats '/ns' as global", () ->
-      Name::isGlobal('/ns').should.equal true
+      Name.isGlobal('/ns').should.equal true
 
     it "should treats '~' as private", () ->
-      Name::isGlobal('~').should.equal false
+      Name.isGlobal('~').should.equal false
 
     it "should treats '' as normal", () ->
-      Name::isGlobal('').should.equal false
+      Name.isGlobal('').should.equal false
 
     it 'should treats undefined as illegal', () ->
-      Name::isGlobal().should.equal false
+      Name.isGlobal().should.equal false
 
     it 'should fit official cases', () ->
       tests = ['/', '/global', '/global2']
       fails = ['', 'not_global', 'not/global']
       for test in tests
-        Name::isGlobal(test).should.equal yes
+        Name.isGlobal(test).should.equal yes
       for test in fails
-        Name::isGlobal(test).should.equal no
+        Name.isGlobal(test).should.equal no
 
   describe 'toGlobal', () ->
     it 'should throw Error on private name', () ->
-      should.Throw((-> Name::toGlobal('~foo')), Error, "Cannot turn private name [~foo] into a global name")
+      should.Throw((-> Name.toGlobal('~foo')), Error, "Cannot turn private name [~foo] into a global name")
 
     it 'should works on relative names', () ->
-      Name::toGlobal('').should.equal '/'
-      Name::toGlobal('foo').should.equal '/foo/'
+      Name.toGlobal('').should.equal '/'
+      Name.toGlobal('foo').should.equal '/foo/'
 
     it 'should works on public names', () ->
-      Name::toGlobal('/foo').should.equal '/foo/'
-      Name::toGlobal('/foo/').should.equal '/foo/'
-      Name::toGlobal('/foo/bar').should.equal '/foo/bar/'
-      Name::toGlobal('/foo/bar/').should.equal '/foo/bar/'
+      Name.toGlobal('/foo').should.equal '/foo/'
+      Name.toGlobal('/foo/').should.equal '/foo/'
+      Name.toGlobal('/foo/bar').should.equal '/foo/bar/'
+      Name.toGlobal('/foo/bar/').should.equal '/foo/bar/'
 
     it 'should be functional', () ->
       name = 'foo'
-      Name::toGlobal(name)
+      Name.toGlobal(name)
       name.should.equal 'foo'
 
   describe 'toCallerID', () ->
     it 'should throw error on any private name', () ->
-      should.Throw((-> Name::toCallerID('~name')), Error)
+      should.Throw((-> Name.toCallerID('~name')), Error)
 
     it 'should works by default', () ->
-      Name::toCallerID('node').should.equal '/node/'
-      Name::toCallerID('bar/node').should.equal '/bar/node/'
-      Name::toCallerID('/bar/node').should.equal '/bar/node/'
+      Name.toCallerID('node').should.equal '/node/'
+      Name.toCallerID('bar/node').should.equal '/bar/node/'
+      Name.toCallerID('/bar/node').should.equal '/bar/node/'
 
     it 'should works when ENV set', () ->
       ns = process.env[env.ROS_NAMESPACE]
       process.env[env.ROS_NAMESPACE] = '/test/'
-      Name::toCallerID('node').should.equal '/test/node/'
-      Name::toCallerID('bar/node').should.equal '/test/bar/node/'
-      Name::toCallerID('/bar/node').should.equal '/bar/node/'
+      Name.toCallerID('node').should.equal '/test/node/'
+      Name.toCallerID('bar/node').should.equal '/test/bar/node/'
+      Name.toCallerID('/bar/node').should.equal '/bar/node/'
       process.env[env.ROS_NAMESPACE] = ns
 
   describe 'isLegal', () ->
     it "should treats empty string as legal name", () ->
-      Name::isLegal('').should.equal true
+      Name.isLegal('').should.equal true
 
     it "should treats any legal name as legal", () ->
-      Name::isLegal('/').should.equal true
-      Name::isLegal('~').should.equal true
-      Name::isLegal('~anything').should.equal true
-      Name::isLegal('/ns/p/a/t/h').should.equal true
-      Name::isLegal('/ns/p/a/t/h/').should.equal true
+      Name.isLegal('/').should.equal true
+      Name.isLegal('~').should.equal true
+      Name.isLegal('~anything').should.equal true
+      Name.isLegal('/ns/p/a/t/h').should.equal true
+      Name.isLegal('/ns/p/a/t/h/').should.equal true
 
     it "should treats use of empty namespave as illegal", () ->
-      Name::isLegal('//').should.equal false
-      Name::isLegal('///').should.equal false
-      Name::isLegal('////').should.equal false
+      Name.isLegal('//').should.equal false
+      Name.isLegal('///').should.equal false
+      Name.isLegal('////').should.equal false
 
     it 'should treats undefined as illegal', () ->
-      Name::isLegal().should.equal false
+      Name.isLegal().should.equal false
 
     it 'should fit official cases', () ->
       tests = ['',
@@ -106,14 +105,14 @@ describe 'glgraph.name.Name', () ->
         '~/f',
         '/a/b/c/d', '/']
       for test in tests
-        Name::isLegal(test).should.equal yes
+        Name.isLegal(test).should.equal yes
       failures = [null, undefined,
         'foo++', 'foo-bar', '#foo',
         'hello\n', '\t', ' name', 'name ',
         'f//b',
         '1name', 'foo\\']
       for test in failures
-        Name::isLegal(test).should.equal no
+        Name.isLegal(test).should.equal no
 
   describe 'isLegalBase', () ->
     it "should return false on illegal names", () ->
@@ -125,16 +124,16 @@ describe 'glgraph.name.Name', () ->
         ' name', 'name ',
         '1name', 'foo\\']
       for name in illegalNames
-        Name::isLegalBaseName(name).should.equal no, "#{JSON.stringify name} is illegal"
+        Name.isLegalBaseName(name).should.equal no, "#{JSON.stringify name} is illegal"
 
     it "should return false on illegal names", () ->
       legalNames = ['f', 'f1', 'f_', 'foo', 'foo_bar']
       for name in legalNames
-        Name::isLegalBaseName(name).should.equal yes, "#{JSON.stringify name} is legal"
+        Name.isLegalBaseName(name).should.equal yes, "#{JSON.stringify name} is legal"
 
   describe 'join', () ->
     test = (ns, name, expected) ->
-      Name::join(ns, name).should.equal expected,
+      Name.join(ns, name).should.equal expected,
         "(#{JSON.stringify ns}, #{JSON.stringify name}) => #{JSON.stringify expected}"
 
     it 'private and global names cannot be joined', () ->
@@ -181,11 +180,11 @@ describe 'glgraph.name.Name', () ->
         ['/foo/bar', '/foo/bar']
       ]
       for [input, expected] in tests
-        Name::canonicalize(input).should.equal expected, "'#{input}' => '#{expected}'"
+        Name.canonicalize(input).should.equal expected, "'#{input}' => '#{expected}'"
 
-  describe 'getNamespace', () ->
+  describe 'namespaceOf', () ->
     test = (input, expected) ->
-      Name::getNamespace(input).should.equal expected, "(#{JSON.stringify input}) => #{JSON.stringify expected}"
+      Name.namespaceOf(input).should.equal expected, "(#{JSON.stringify input}) => #{JSON.stringify expected}"
 
     it 'should works on official test cases', () ->
       cases = [
@@ -213,7 +212,7 @@ describe 'glgraph.name.Name', () ->
   describe 'resolve', () ->
     it 'should fit official cases', () ->
       test = (name, ns, expected) ->
-        Name::resolve(name, ns).should.equal expected, "('#{name}', '#{ns}') => '#{expected}'"
+        Name.resolve(name, ns).should.equal expected, "('#{name}', '#{ns}') => '#{expected}'"
       cases = [
         ['', '/', '/']
         ['', '/node', '/']
@@ -251,13 +250,13 @@ describe 'glgraph.name.Name', () ->
 
   describe 'resolveScriptName', () ->
     it 'should fit official cases', () ->
-      Name::resolveScriptName('/myscript', '/global').should.equal '/global'
-      Name::resolveScriptName('/myscript', '').should.equal(Name::getROSNamespace())
-      Name::resolveScriptName('/myscript', 'foo').should.equal(Name::join(Name::getROSNamespace(), 'foo'))
-      Name::resolveScriptName('/myscript', '~private').should.equal('/myscript/private')
+      Name.resolveScriptName('/myscript', '/global').should.equal '/global'
+      Name.resolveScriptName('/myscript', '').should.equal(Name.getROSNamespace())
+      Name.resolveScriptName('/myscript', 'foo').should.equal(Name.join(Name.getROSNamespace(), 'foo'))
+      Name.resolveScriptName('/myscript', '~private').should.equal('/myscript/private')
 
   describe 'genAnonymous', () ->
-    val = Name::genAnonymous('foo')
+    val = Name.genAnonymous('foo')
     it 'should contains id', () ->
       val.search('foo').should.not.equal -1
 
@@ -270,47 +269,47 @@ describe 'glgraph.name.Name', () ->
     it "should not generate same name in 10K tries", () ->
       names = new Set()
       for counter in [1..10000]
-        name = Name::genAnonymous()
+        name = Name.genAnonymous()
         names.has(name).should.equal no
         names.add(name)
 
 describe 'glgraph.name', () ->
   describe 'loadMapping', () ->
     it 'should loads nothing if no remapping found', () ->
-      test = (c) -> Name::loadMapping([c]).should.eql {}, "('#{[c]}') => {}"
+      test = (c) -> Name.loadMapping([c]).should.eql {}, "('#{[c]}') => {}"
       test c for c in ['foo', ':=', ':=:=', 'f:=', ':=b', 'foo:=bar:=baz']
 
     it 'should ignore node param assignments', () ->
-      Name::loadMapping(['_foo:=bar']).should.eql {}
-      Name::loadMapping(['foo:=bar']).should.eql {'foo': 'bar'}
+      Name.loadMapping(['_foo:=bar']).should.eql {}
+      Name.loadMapping(['foo:=bar']).should.eql {'foo': 'bar'}
 
     it 'should allow double-underscore names', () ->
-      Name::loadMapping(['__foo:=bar']).should.eql {'__foo': 'bar'}
-      Name::loadMapping(['./f', '-x', '--blah',
+      Name.loadMapping(['__foo:=bar']).should.eql {'__foo': 'bar'}
+      Name.loadMapping(['./f', '-x', '--blah',
         'foo:=bar']).should.eql {'foo': 'bar'}
-      Name::loadMapping(['c:=3', 'c:=', ':=3', 'a:=1',
+      Name.loadMapping(['c:=3', 'c:=', ':=3', 'a:=1',
         'b:=2']).should.eql {a: '1', b: '2', c: '3'}
 
   describe 'getROSNamespace', () ->
     ns = process.env[env.ROS_NAMESPACE]
     it 'should works...', () ->
-      Name::getROSNamespace().should.equal '/'
-      Name::getROSNamespace(null, []).should.equal '/'
-      Name::getROSNamespace({}, null).should.equal '/'
-      Name::getROSNamespace({}, []).should.equal '/'
+      Name.getROSNamespace().should.equal '/'
+      Name.getROSNamespace(null, []).should.equal '/'
+      Name.getROSNamespace({}, null).should.equal '/'
+      Name.getROSNamespace({}, []).should.equal '/'
 
     it "should works when #{env.ROS_NAMESPACE} is set", () ->
       process.env[env.ROS_NAMESPACE] = 'unresolved'
-      Name::getROSNamespace().should.equal '/unresolved/'
-      Name::getROSNamespace({'ROS_NAMESPACE': '/resolved'}).should.equal '/resolved/'
+      Name.getROSNamespace().should.equal '/unresolved/'
+      Name.getROSNamespace({'ROS_NAMESPACE': '/resolved'}).should.equal '/resolved/'
       process.env[env.ROS_NAMESPACE] = ns
 
     it 'should works when argv is set', () ->
       r = process.argv
       process.argv = ['foo', '__ns:=unresolved_ns']
-      Name::getROSNamespace().should.equal '/unresolved_ns/'
-      Name::getROSNamespace(null, ['foo', '__ns:=unresolved_ns2']).should.equal '/unresolved_ns2/'
+      Name.getROSNamespace().should.equal '/unresolved_ns/'
+      Name.getROSNamespace(null, ['foo', '__ns:=unresolved_ns2']).should.equal '/unresolved_ns2/'
       process.argv = ['foo', '__ns:=/resolved_ns/']
-      Name::getROSNamespace().should.equal '/resolved_ns/'
-      Name::getROSNamespace(null, ['foo', '__ns:=resolved_ns2']).should.equal '/resolved_ns2/'
+      Name.getROSNamespace().should.equal '/resolved_ns/'
+      Name.getROSNamespace(null, ['foo', '__ns:=resolved_ns2']).should.equal '/resolved_ns2/'
       process.argv = r
