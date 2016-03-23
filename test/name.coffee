@@ -64,6 +64,9 @@ describe 'glgraph.name.Name', () ->
       name.should.equal 'foo'
 
   describe 'toCallerID', () ->
+    it 'should throw error on any private name', () ->
+      should.Throw((-> Name::toCallerID('~name')), Error)
+
     it 'should works by default', () ->
       Name::toCallerID('node').should.equal '/node/'
       Name::toCallerID('bar/node').should.equal '/bar/node/'
