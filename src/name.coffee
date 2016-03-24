@@ -34,9 +34,9 @@ isGlobal = (name) -> name? and name.startsWith SEP
 # @return [Boolean] if the name is legal
 isLegal = (name) ->
   if not _.isString(name)
-    return no 
+    return no
   if name.length == 0
-    return yes 
+    return yes
   m = name.match NAME_VALIDATOR
   return m? and m[0] == name and name.search('//') == -1
 
@@ -45,9 +45,11 @@ isLegal = (name) ->
 isLegalBaseName = (name) ->
   return name? and name.match(BASE_NAME_VALIDATOR)?[0] == name
 
-# Join a namespace and name. If name is unjoinable (i.e. ~private or /global) it will be returned without joining
+# Join a namespace and name. If name is unjoinable (i.e. ~private or /global)
+# it will be returned without joining
 #
-# @param ns [String] namespace ('/' and '~' are both legal). If ns is the empty string, name will be returned.
+# @param ns [String] namespace ('/' and '~' are both legal). If ns is the empty
+# string, name will be returned.
 # @param name [String] a legal name
 # @return [String] name concatenated to ns, or name if it is unjoinable.
 join = (ns, name) ->
@@ -65,7 +67,7 @@ join = (ns, name) ->
 #
 # @param name [String] ROS name
 canonicalize = (name) ->
-  if not name or name == SEP 
+  if not name or name == SEP
     return name
   canonical = (x for x in name.split SEP when x).join SEP
   if name.startsWith SEP
@@ -87,9 +89,11 @@ toGlobal = (name) ->
     name = name + SEP
   return name
 
-# Resolve a local name to the caller ID based on ROS environment settings (i.e. ROS_NAMESPACE)
+# Resolve a local name to the caller ID based on ROS environment settings,
+# i.e. ROS_NAMESPACE
 #
-# @param name [String] local name to calculate caller ID from, e.g. 'camera', 'node'
+# @param name [String] local name to calculate caller ID from,
+# e.g. 'camera', 'node'
 # @return [String] caller ID based on supplied local name
 toCallerID = (name) ->
   toGlobal(join(getROSNamespace(), name))
@@ -113,7 +117,8 @@ namespaceOf = (name) ->
 # are resolved relative to the node name.
 # @param name [String] name to solve
 # @param ns [String] node name to resolve relative to
-# @param remappings [Object] Map of resolved remappings. Use {} or null to indicate no remapping
+# @param remapping [Object] Map of resolved remapping Use {} or null to
+# indicate no remapping
 # @return [String] Resolved name. If name is empty/not given, resolve_name
 # returns parent namespace_. If namespace_ is empty/not given
 resolve = (name, ns, remapping) ->
