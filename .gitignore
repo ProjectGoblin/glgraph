@@ -145,7 +145,8 @@ tags
 .LSOverride
 
 # Icon must end with two \r
-Icon
+Icon
+
 
 # Thumbnails
 ._*
@@ -233,3 +234,6 @@ lib/
 
 # Ignore generated doc
 doc/
+
+# Ignore generated coverage report
+coverage.html

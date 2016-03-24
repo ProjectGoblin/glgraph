@@ -6,7 +6,7 @@ graph = require '../lib/graph'
 env = graph.env
 Name = graph.name
 
-describe 'glgraph.name.Name', () ->
+describe 'ros-graph.name', () ->
   describe 'isPrivate', () ->
     it "should treats '~private' as private", () ->
       Name.isPrivate('~private').should.equal true
@@ -189,6 +189,10 @@ describe 'glgraph.name.Name', () ->
   describe 'namespaceOf', () ->
     test = (input, expected) ->
       Name.namespaceOf(input).should.equal expected, "(#{JSON.stringify input}) => #{JSON.stringify expected}"
+    
+    it 'should throw TypeError when name is not a String', () ->
+      for something in [null, undefined, 4.2, {}, [], /non-string/]
+        should.Throw((-> Name.namespaceOf(something)), TypeError)
 
     it 'should works on official test cases', () ->
       cases = [
@@ -252,6 +256,11 @@ describe 'glgraph.name.Name', () ->
       for [name, ns, expected] in cases
         test name, ns, expected
 
+    it 'should use remapping when resolved name hits', () ->
+      Name.resolve('foo', '/', 'not-hit': '~bar').should.equal '/foo'
+      Name.resolve('foo', '/', '/foo': '/baz').should.equal '/baz'
+
+
   describe 'resolveScriptName', () ->
     it 'should fit official cases', () ->
       Name.resolveScriptName('/myscript', '/global').should.equal '/global'
@@ -277,7 +286,6 @@ describe 'glgraph.name.Name', () ->
         names.has(name).should.equal no
         names.add(name)
 
-describe 'glgraph.name', () ->
   describe 'loadMapping', () ->
     it 'should loads nothing if no remapping found', () ->
       test = (c) -> Name.loadMapping([c]).should.eql {}, "('#{[c]}') => {}"

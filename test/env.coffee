@@ -9,7 +9,7 @@ env = graph.env
 globalENV = {}
 globalARGV = []
 
-describe 'glgraph.env', () ->
+describe 'ros-graph.env', () ->
   before () ->
     globalENV = _.extend {}, process.env
     globalARGV = process.argv
