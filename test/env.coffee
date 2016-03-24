@@ -1,4 +1,6 @@
-require('blanket')(pattern: 'lib')
+require('blanket')
+  pattern: 'lib'
+  'data-cover-never': ['test', 'src', 'node_modules']
 _ = require 'underscore'
 should = (require 'chai').should()
 graph = require '../lib/graph'
